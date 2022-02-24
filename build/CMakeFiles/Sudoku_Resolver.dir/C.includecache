@@ -6,13 +6,15 @@
 
 #IncludeRegexTransform: 
 
-C:/Users/Mev/Documents/Sudoku_Resolver/fonctions.c
-stdio.h
--
-fonctions.h
-C:/Users/Mev/Documents/Sudoku_Resolver/fonctions.h
-
 C:/Users/Mev/Documents/Sudoku_Resolver/fonctions.h
 stdbool.h
 -
+
+C:/Users/Mev/Documents/Sudoku_Resolver/main.c
+stdio.h
+-
+stdint.h
+-
+fonctions.h
+C:/Users/Mev/Documents/Sudoku_Resolver/fonctions.h
 
