@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/Mev/Documents/Sudoku_Resolver/fonctions.c
+stdio.h
+-
+fonctions.h
+C:/Users/Mev/Documents/Sudoku_Resolver/fonctions.h
+
+C:/Users/Mev/Documents/Sudoku_Resolver/fonctions.h
+stdbool.h
+-
+
