@@ -1,15 +1,19 @@
 /* JEANNE-ROSE Méven
-    30/12/21
+    02/05/22
 */
-
-//char 1 int 4 bool 1
-//colonne - ligne
 
 //#include <gtk/gtk.h>
 #include <stdio.h>
-#include <stdbool.h>
-
+#include <stdint.h>
 #include "fonctions.h"
+
+struct Cellule{
+  uint16_t valeurs_possible : 9;
+  uint16_t nombre_possibilite : 7;
+  uint8_t valeur;
+  uint8_t padding;
+};
+
 
 /*static void
 print_hello (GtkWidget *widget,
@@ -36,7 +40,6 @@ activate (GtkApplication *app,
   gtk_window_present (GTK_WINDOW (window));
 }*/
 
-char profondeur;
 char ti [9][9] =   {0, 0, 9, 0, 0, 2, 0, 0, 5,
                     5, 3, 8, 0, 6, 4, 0, 0, 9,
                     1, 6, 2, 0, 0, 0, 0, 3, 0,
@@ -48,9 +51,7 @@ char ti [9][9] =   {0, 0, 9, 0, 0, 2, 0, 0, 5,
                     0, 9, 1, 0, 0, 0, 4, 7, 0
   };
 
-int
-main (int    argc,
-      char **argv)
+int main (int argc, char **argv)
 {
   /*GtkApplication *app;
   int status;
@@ -62,12 +63,14 @@ main (int    argc,
 
   return status;*/
 
-  profondeur = 0;
+struct Cellule cell;
+  printf("taille de la structure : %d\n", sizeof(cell));
+  struct Cellule tableau[9][9];
+
+  printf("taille du tableau : %d\n", sizeof(tableau));
   
   printf("*****TI*****\n");
   Affichage(ti);
-  
-  Resolution(3,4,5,0);
 
   return 0;
 }
