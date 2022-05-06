@@ -1,15 +1,48 @@
 /* JEANNE-ROSE Méven
-    30/12/21
+    04/05/22
 */
 
 #ifndef _FONCTION_H
 #define _FONCTION_H
 
 #include <stdbool.h>
+#include <stdint.h>
+
+struct Cellule{
+  uint16_t valeurs_possibles : 9;
+  uint16_t nombre_possibilites : 7;
+  uint8_t valeur;
+  uint8_t padding;
+};
 
 /********DISPLAY*******/
 
-void Affichage(char[9][9]);
-/*Display 9*9 array : ti, tLigne and tCol*/
+/*Display 9*9 array values*/
+void Affichage(struct Cellule[9][9]);
 
+/*Init first param array with 2nd param */
+void init_array(struct Cellule[9][9], uint8_t tab[9][9]);
+
+/*calculate and Fill "valeurs_possibles" field of the struct
+@return minimum number of possibilities*/
+uint8_t calcul_valeurs_possibles(struct Cellule[9][9]);
+
+/*Update number of possibilities thanks to number of bits set in "valeurs_possibles" field
+@return number of possibilities
+*/
+uint8_t update_nb_possibilites(struct Cellule);
+
+/*update possible value following line elements value
+@return number of possibilities following line other values*/
+uint8_t calcul_valeurs_possibles_ligne(uint8_t ligne, uint8_t col, struct Cellule[9][9]);
+
+/*display bits field "valeurs possibles"*/
+void affiche_valeurs_possibles(struct Cellule);
+
+/*Entry point
+@return 0: SUCCESS i otherwise*/
+uint8_t resolution(struct Cellule[9][9]);
+
+/*Set value for a celle when it has only one possibility or to try a branch*/
+void set_value(struct Cellule);
 #endif

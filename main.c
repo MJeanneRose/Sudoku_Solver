@@ -5,14 +5,8 @@
 //#include <gtk/gtk.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "fonctions.h"
 
-struct Cellule{
-  uint16_t valeurs_possible : 9;
-  uint16_t nombre_possibilite : 7;
-  uint8_t valeur;
-  uint8_t padding;
-};
+#include "fonctions.h"
 
 
 /*static void
@@ -40,7 +34,7 @@ activate (GtkApplication *app,
   gtk_window_present (GTK_WINDOW (window));
 }*/
 
-char ti [9][9] =   {0, 0, 9, 0, 0, 2, 0, 0, 5,
+uint8_t ti [9][9] =   {0, 0, 9, 0, 0, 2, 0, 0, 5,
                     5, 3, 8, 0, 6, 4, 0, 0, 9,
                     1, 6, 2, 0, 0, 0, 0, 3, 0,
                     0, 0, 3, 0, 2, 7, 0, 0, 0,
@@ -63,14 +57,14 @@ int main (int argc, char **argv)
 
   return status;*/
 
-struct Cellule cell;
-  printf("taille de la structure : %d\n", sizeof(cell));
   struct Cellule tableau[9][9];
 
-  printf("taille du tableau : %d\n", sizeof(tableau));
+  init_array(tableau, ti);
   
   printf("*****TI*****\n");
-  Affichage(ti);
+  Affichage(tableau);
+
+resolution(tableau);
 
   return 0;
 }
