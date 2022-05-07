@@ -1,12 +1,12 @@
 [
 {
   "directory": "C:/Users/Mev/Documents/Sudoku_Resolver/build",
-  "command": "C:\\MinGW\\bin\\mingw32-gcc.exe   -g -o CMakeFiles\\Sudoku_Resolver.dir\\main.c.obj -c C:\\Users\\Mev\\Documents\\Sudoku_Resolver\\main.c",
+  "command": "C:/MinGW/bin/gcc.exe   -g -o CMakeFiles/Sudoku_Resolver.dir/main.c.obj -c C:/Users/Mev/Documents/Sudoku_Resolver/main.c",
   "file": "C:/Users/Mev/Documents/Sudoku_Resolver/main.c"
 },
 {
   "directory": "C:/Users/Mev/Documents/Sudoku_Resolver/build",
-  "command": "C:\\MinGW\\bin\\mingw32-gcc.exe   -g -o CMakeFiles\\Sudoku_Resolver.dir\\fonctions.c.obj -c C:\\Users\\Mev\\Documents\\Sudoku_Resolver\\fonctions.c",
+  "command": "C:/MinGW/bin/gcc.exe   -g -o CMakeFiles/Sudoku_Resolver.dir/fonctions.c.obj -c C:/Users/Mev/Documents/Sudoku_Resolver/fonctions.c",
   "file": "C:/Users/Mev/Documents/Sudoku_Resolver/fonctions.c"
 }
 ]

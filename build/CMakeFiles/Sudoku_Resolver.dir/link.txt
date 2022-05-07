@@ -1,3 +1,0 @@
-"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\Sudoku_Resolver.dir/objects.a
-C:\MinGW\bin\ar.exe cr CMakeFiles\Sudoku_Resolver.dir/objects.a @CMakeFiles\Sudoku_Resolver.dir\objects1.rsp
-C:\MinGW\bin\mingw32-gcc.exe -g -Wl,--whole-archive CMakeFiles\Sudoku_Resolver.dir/objects.a -Wl,--no-whole-archive -o Sudoku_Resolver.exe -Wl,--out-implib,libSudoku_Resolver.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\Sudoku_Resolver.dir\linklibs.rsp

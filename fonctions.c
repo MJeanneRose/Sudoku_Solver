@@ -1,5 +1,5 @@
 /* JEANNE-ROSE Méven
-    30/12/21
+    4/5/22
 */
 #include <stdio.h>
 #include "fonctions.h"
@@ -42,16 +42,16 @@ uint8_t resolution(struct Cellule tableau[9][9]){
             printf("Value found at [%d][%d] : ",ligne, colonne);
             affiche_valeurs_possibles(tableau[ligne][colonne]);
             set_value(&tableau[ligne][colonne]);
-            Affichage(tableau);
+            //Affichage(tableau);
         }
         else if(rvalue > 1){
             printf("%d possibilities at [%d][%d] : ", rvalue, ligne, colonne);
             affiche_valeurs_possibles(tableau[ligne][colonne]);
             Affichage(tableau);
         }
-        //break;
     }while(rvalue == 1);
     printf("End of the resolution\n");
+    Affichage(tableau);
     
 }
 

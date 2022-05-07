@@ -5,7 +5,6 @@
 #ifndef _FONCTION_H
 #define _FONCTION_H
 
-#include <stdbool.h>
 #include <stdint.h>
 
 struct Cellule{

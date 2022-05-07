@@ -1,4 +1,4 @@
-set(CMAKE_C_COMPILER "C:/MinGW/bin/mingw32-gcc.exe")
+set(CMAKE_C_COMPILER "C:/MinGW/bin/gcc.exe")
 set(CMAKE_C_COMPILER_ARG1 "")
 set(CMAKE_C_COMPILER_ID "GNU")
 set(CMAKE_C_COMPILER_VERSION "9.2.0")
@@ -19,9 +19,9 @@ set(CMAKE_C_SIMULATE_VERSION "")
 
 
 set(CMAKE_AR "C:/MinGW/bin/ar.exe")
-set(CMAKE_C_COMPILER_AR "C:/MinGW/bin/mingw32-gcc-ar.exe")
+set(CMAKE_C_COMPILER_AR "C:/MinGW/bin/gcc-ar.exe")
 set(CMAKE_RANLIB "C:/MinGW/bin/ranlib.exe")
-set(CMAKE_C_COMPILER_RANLIB "C:/MinGW/bin/mingw32-gcc-ranlib.exe")
+set(CMAKE_C_COMPILER_RANLIB "C:/MinGW/bin/gcc-ranlib.exe")
 set(CMAKE_LINKER "C:/MinGW/bin/ld.exe")
 set(CMAKE_MT "")
 set(CMAKE_COMPILER_IS_GNUCC 1)
