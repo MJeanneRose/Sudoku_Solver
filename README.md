@@ -1,1 +1,1 @@
-Sudoku Resolver written in C
+Sudoku Resolver written in C with gtk
