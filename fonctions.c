@@ -6,6 +6,7 @@
 
 void Affichage(struct Cellule tab[9][9])
 {
+    printf("*****ARRAY*****\n");
     for (uint8_t i = 0; i < 9; i++)
     {
         for (uint8_t j = 0; j < 9; j++){
@@ -33,35 +34,100 @@ void init_array(struct Cellule array[9][9], uint8_t tab[9][9]){
 }
 
 uint8_t resolution(struct Cellule tableau[9][9]){
-    calcul_valeurs_possibles(tableau);
+    uint8_t ligne, colonne, rvalue;
+    do{
+        printf("Computing...\n");
+        rvalue = calcul_valeurs_possibles(tableau, &ligne, &colonne);
+        if(rvalue == 1){
+            printf("Value found at [%d][%d] : ",ligne, colonne);
+            affiche_valeurs_possibles(tableau[ligne][colonne]);
+            set_value(&tableau[ligne][colonne]);
+            Affichage(tableau);
+        }
+        else if(rvalue > 1){
+            printf("%d possibilities at [%d][%d] : ", rvalue, ligne, colonne);
+            affiche_valeurs_possibles(tableau[ligne][colonne]);
+            Affichage(tableau);
+        }
+        //break;
+    }while(rvalue == 1);
+    printf("End of the resolution\n");
+    
 }
 
-uint8_t calcul_valeurs_possibles(struct Cellule array[9][9]){
-    struct Cellule max;
-    max.nombre_possibilites = 9;
-    max.valeurs_possibles = 0x1FF;
-    uint8_t nb_possiblities;
-    uint8_t ligne, colonne;
+uint8_t calcul_valeurs_possibles(struct Cellule array[9][9], uint8_t *ligne, uint8_t *colonne){
+    struct Cellule minimum;
+    minimum.nombre_possibilites = 9;
+    minimum.valeurs_possibles = 0x1FF;
 
-    for(uint8_t i=0; i<1;i++){//remettre à 9 pour faire tout le tableau
-        for(uint8_t j=0; j<9;j++){
-            nb_possiblities = calcul_valeurs_possibles_ligne(i, j, array);
-            if(nb_possiblities == 1){
-                set_value(array[i][j]);
-                //return to recompute array
+    printf("Line calculation... ");
+    calcul_valeurs_possibles_selon_ligne(array, &minimum, ligne, colonne);
+    printf("Ok\n");
+    if(minimum.nombre_possibilites == 1){
+        return 1;
+    }
+    printf("Number of possibilities min : %d at [%d][%d]\n", minimum.nombre_possibilites, *ligne, *colonne);
+
+    printf("Column calculation... ");
+    calcul_valeurs_possibles_selon_colonne(array, &minimum, ligne, colonne);
+    printf("Ok\n");
+    if(minimum.nombre_possibilites == 1){
+        return 1;
+    }
+    printf("Number of possibilities min : %d at [%d][%d]\n", minimum.nombre_possibilites, *ligne, *colonne);
+    
+    return minimum.nombre_possibilites;
+}
+
+void calcul_valeurs_possibles_selon_ligne(struct Cellule array[9][9], struct Cellule *min, uint8_t *ligne, uint8_t *colonne){
+    uint8_t nb_possibilites;
+    for(uint8_t i=0 ; i<9 ; i++){//remettre à 9 pour faire tout le tableau
+        for(uint8_t j=0 ; j<9 ; j++){
+            if(array[i][j].valeur){//cell contains a value, don't compute the possibilities
+                continue;
             }
-            else if((nb_possiblities <= max.nombre_possibilites) && nb_possiblities != 0){
-                max.nombre_possibilites = nb_possiblities;
-                max.valeurs_possibles = array[i][j].valeurs_possibles;
-                ligne = i;
-                colonne = j;
+            nb_possibilites = calcul_valeurs_possibles_cellule_selon_ligne(i, j, array);
+            if((nb_possibilites <= min->nombre_possibilites) && (nb_possibilites !=0)){
+                *ligne = i;
+                *colonne = j;
+                if(nb_possibilites == 1){
+                    min->nombre_possibilites = 1;
+                    return;
+                }
+                else{
+                    min->nombre_possibilites = nb_possibilites;
+                    min->valeurs_possibles = array[i][j].valeurs_possibles;
+                }
             }
-            printf("default : %d [%d][%d]\t [%d][%d] : %d\n", max.nombre_possibilites, ligne, colonne, i, j, nb_possiblities);
         }
     }
 }
 
-uint8_t calcul_valeurs_possibles_ligne(uint8_t ligne, uint8_t col, struct Cellule array[9][9]){
+void calcul_valeurs_possibles_selon_colonne(struct Cellule array[9][9], struct Cellule *min, uint8_t *ligne, uint8_t *colonne){
+    uint8_t nb_possibilites;
+    for(uint8_t i=0 ; i<9 ; i++){//remettre à 9 pour faire tout le tableau
+        for(uint8_t j=0 ; j<9 ; j++){
+            if(array[i][j].valeur){//cell contains a value, don't compute the possibilities
+                continue;
+            }
+            nb_possibilites = calcul_valeurs_possibles_cellule_selon_colonne(i, j, array);
+            if((nb_possibilites <= min->nombre_possibilites) && (nb_possibilites !=0)){
+                *ligne = i;
+                *colonne = j;
+                if(nb_possibilites == 1){
+                    min->nombre_possibilites = 1;
+                    return;
+                }
+                else{
+                    min->nombre_possibilites = nb_possibilites;
+                    min->valeurs_possibles = array[i][j].valeurs_possibles;
+                }
+            }
+        }
+    }
+}
+
+uint8_t calcul_valeurs_possibles_cellule_selon_ligne(uint8_t ligne, uint8_t col, struct Cellule array[9][9]){
     uint8_t val;
     
     for(uint8_t column = 0; column <9; column++){
@@ -74,7 +140,21 @@ uint8_t calcul_valeurs_possibles_ligne(uint8_t ligne, uint8_t col, struct Cellul
     }
     //printf("nb possibilities : %d",update_nb_possibilites(array[ligne][col]));
     return update_nb_possibilites(array[ligne][col]);
+}
 
+uint8_t calcul_valeurs_possibles_cellule_selon_colonne(uint8_t ligne, uint8_t colonne, struct Cellule array[9][9]){
+    uint8_t val;
+    
+    for(uint8_t line = 0; line <9; line++){
+        val = array[line][colonne].valeur;
+        if((line == ligne) || (val==0))
+            continue;
+
+        array[ligne][colonne].valeurs_possibles &= ~(0x100 >> (val-1));
+        //printf("%d detecte, masque : %x\n", val, ~(0x100 >> (val-1)));
+    }
+    //printf("nb possibilities : %d",update_nb_possibilites(array[ligne][col]));
+    return update_nb_possibilites(array[ligne][colonne]);
 }
 
 uint8_t update_nb_possibilites(struct Cellule cell){
@@ -87,24 +167,28 @@ uint8_t update_nb_possibilites(struct Cellule cell){
     return cell.nombre_possibilites;
 }
 
-void set_value(struct Cellule cell){
-    cell.nombre_possibilites = 0;
+void set_value(struct Cellule *cell){
     for(uint8_t i = 0; i< 9; i++){
-       if(cell.valeurs_possibles & (0x100 >> i)){
-            cell.valeur = i+1;
-            cell.valeurs_possibles = 0;
+       if(cell->valeurs_possibles & (0x100 >> i)){
+            cell->valeur = i+1;
             return;
         }
     }
 }
 
 void affiche_valeurs_possibles(struct Cellule cell){
-    for(uint8_t i=0; i<9;i++){
+    /*for(uint8_t i=0; i<9;i++){
         if(cell.valeurs_possibles & (0x100 >> i)){
             printf("1");
         }
         else{
             printf("0");
+        }
+    }
+    printf(" : ");*/
+    for(uint8_t i=0; i<9;i++){
+        if(cell.valeurs_possibles & (0x100 >> i)){
+            printf("%d ",i+1);
         }
     }
     printf("\n");

@@ -61,10 +61,9 @@ int main (int argc, char **argv)
 
   init_array(tableau, ti);
   
-  printf("*****TI*****\n");
   Affichage(tableau);
 
-resolution(tableau);
+  resolution(tableau);
 
   return 0;
 }
