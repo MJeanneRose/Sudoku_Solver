@@ -1,3 +1,0 @@
-C:/Users/Mev/Documents/Sudoku_Resolver/build/CMakeFiles/Sudoku_Resolver.dir
-C:/Users/Mev/Documents/Sudoku_Resolver/build/CMakeFiles/edit_cache.dir
-C:/Users/Mev/Documents/Sudoku_Resolver/build/CMakeFiles/rebuild_cache.dir
