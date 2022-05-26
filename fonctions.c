@@ -52,6 +52,7 @@ uint8_t resolution(struct Cellule tableau[9][9]){
     }while(rvalue == 1);
     printf("End of the resolution\n");
     Affichage(tableau);
+    return rvalue;
     
 }
 
