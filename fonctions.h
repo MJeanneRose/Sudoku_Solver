@@ -6,6 +6,7 @@
 #define _FONCTION_H
 
 #include <stdint.h>
+#include <gtk/gtk.h>
 
 struct Cellule{
   uint16_t valeurs_possibles : 9;
