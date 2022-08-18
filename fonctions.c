@@ -6,13 +6,13 @@
 
 #include "fonctions.h"
 
-void main_console(){
-    Affichage(tableau);
-    init_array(tableau, ti);
-    resolution(tableau);
+void main_console(void){
+    Affichage(g_tableau);
+    init_array(g_tableau, g_ti);
+    resolution(g_tableau);
 }
 
-void Affichage(const struct Cellule tab[9][9])
+void Affichage(struct Cellule const tab[9][9])
 {
     printf("*****ARRAY*****\n");
     for (uint8_t i = 0; i < 9; i++)
@@ -25,7 +25,7 @@ void Affichage(const struct Cellule tab[9][9])
     printf("\n");
 }
 
-void init_array(struct Cellule array[9][9], const uint8_t tab[9][9]){
+void init_array(struct Cellule array[9][9], uint8_t const tab[9][9]){
     for(uint8_t i = 0; i<9; i++){
         for(uint8_t j=0; j<9; j++){
             array[i][j].valeur=tab[i][j];
@@ -48,17 +48,13 @@ uint8_t resolution(struct Cellule tableau[9][9]){
         rvalue = calcul_valeurs_possibles(tableau, &ligne, &colonne);
         if(rvalue == 1){
             printf("Value found at [%d][%d] : ",ligne, colonne);
-            /*Used for debug only
             affiche_valeurs_possibles(tableau[ligne][colonne]);
-            */
             set_value(&tableau[ligne][colonne]);
-            //Affichage(tableau);
+            Affichage(tableau);
         }
         else if(rvalue > 1){
             printf("%d possibilities at [%d][%d] : ", rvalue, ligne, colonne);
-            /*Used for debug only
             affiche_valeurs_possibles(tableau[ligne][colonne]);
-            */
             Affichage(tableau);
         }
     }while(rvalue == 1);
@@ -102,7 +98,7 @@ uint8_t calcul_valeurs_possibles(struct Cellule array[9][9], uint8_t *ligne, uin
 
 void calcul_valeurs_possibles_selon_ligne(struct Cellule array[9][9], struct Cellule *min, uint8_t *ligne, uint8_t *colonne){
     uint8_t nb_possibilites;
-    for(uint8_t i=0 ; i<9 ; i++){//remettre à 9 pour faire tout le tableau
+    for(uint8_t i=0 ; i<9 ; i++){
         for(uint8_t j=0 ; j<9 ; j++){
             if(array[i][j].valeur){//cell contains a value, don't compute the possibilities
                 continue;
@@ -126,7 +122,7 @@ void calcul_valeurs_possibles_selon_ligne(struct Cellule array[9][9], struct Cel
 
 void calcul_valeurs_possibles_selon_colonne(struct Cellule array[9][9], struct Cellule *min, uint8_t *ligne, uint8_t *colonne){
     uint8_t nb_possibilites;
-    for(uint8_t i=0 ; i<9 ; i++){//remettre à 9 pour faire tout le tableau
+    for(uint8_t i=0 ; i<9 ; i++){
         for(uint8_t j=0 ; j<9 ; j++){
             if(array[i][j].valeur){//cell contains a value, don't compute the possibilities
                 continue;

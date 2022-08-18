@@ -18,18 +18,19 @@ struct Cellule{
   uint8_t padding;
 };
 
-extern uint8_t ti [9][9];
-extern struct Cellule tableau[9][9];
+extern uint8_t g_ti [9][9];
+extern struct Cellule g_tableau[9][9];
 
-void main_console();
+/*Without GTK, mainly debugging purpose*/
+void main_console(void);
 
 /********DISPLAY*******/
 
 /*Display Stuct Cellule array values in the console*/
-void Affichage(const struct Cellule[9][9]);
+void Affichage(struct Cellule const[9][9]);
 
 /*Init struct Cellule array with an array */
-void init_array(struct Cellule[9][9], const uint8_t tab[9][9]);
+void init_array(struct Cellule[9][9], uint8_t const tab[9][9]);
 
 /*calculate and Fill "valeurs_possibles" field of the struct
 @return minimum number of possibilities*/
