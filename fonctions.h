@@ -1,13 +1,16 @@
 /* JEANNE-ROSE Méven
     04/05/22
+    fonctions.h
+    Performs calculations on array and display in the console
 */
 
 #ifndef _FONCTION_H
 #define _FONCTION_H
 
 #include <stdint.h>
-#include <gtk/gtk.h>
+#include <stdio.h>
 
+/* Structure représentant une case contenant une valeur, nombre de possibilités, etc.*/
 struct Cellule{
   uint16_t valeurs_possibles : 9;
   uint16_t nombre_possibilites : 7;
@@ -15,13 +18,18 @@ struct Cellule{
   uint8_t padding;
 };
 
+extern uint8_t ti [9][9];
+extern struct Cellule tableau[9][9];
+
+void main_console();
+
 /********DISPLAY*******/
 
-/*Display 9*9 array values*/
-void Affichage(struct Cellule[9][9]);
+/*Display Stuct Cellule array values in the console*/
+void Affichage(const struct Cellule[9][9]);
 
-/*Init first param array with 2nd param */
-void init_array(struct Cellule[9][9], uint8_t tab[9][9]);
+/*Init struct Cellule array with an array */
+void init_array(struct Cellule[9][9], const uint8_t tab[9][9]);
 
 /*calculate and Fill "valeurs_possibles" field of the struct
 @return minimum number of possibilities*/
@@ -57,12 +65,14 @@ uint8_t calcul_valeurs_possibles_cellule_selon_colonne(uint8_t ligne, uint8_t co
 uint8_t update_block(uint8_t block_number,uint8_t *ligne, uint8_t *colonne, struct Cellule array[9][9]);
 
 /*display bits field "valeurs possibles"*/
-void affiche_valeurs_possibles(struct Cellule);
+void affiche_valeurs_possibles(const struct Cellule);
 
-/*Entry point
-@return 0: SUCCESS i otherwise*/
+/*Entry point with console mode
+@return 0: SUCCESS i otherwise
+*/
 uint8_t resolution(struct Cellule[9][9]);
 
-/*Set value for a celle when it has only one possibility or to try a branch*/
-void set_value(struct Cellule*);
+/*Set value for a cell when it has only one possibility or to try a branch
+@return The value set, 0 otherwise*/
+uint8_t set_value(struct Cellule*);
 #endif

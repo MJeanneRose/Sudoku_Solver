@@ -8,6 +8,8 @@ endif(NOT CMAKE_BUILD_TYPE)
 
 set(CMAKE_CONFIGURATION_TYPES RELEASE)
 
+set(CMAKE_C_FLAGS "-Wall -Wextra")
+
 #Configure chemin
 set(CMAKE_SOURCE_DIR %{CMAKE_SOURCE_DIR}/src)
 
@@ -18,6 +20,8 @@ pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
 include_directories (${GTK3_INCLUDE_DIRS})
 link_directories(${GTK3_LIBRARY_DIRS})
 add_definitions(${GTK3_CFLAGS_OTHER})
+
+
 
 #Créer des variables avec les fichiers à compiler
 file(GLOB SRCS *.c)
