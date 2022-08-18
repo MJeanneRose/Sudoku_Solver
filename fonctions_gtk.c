@@ -24,7 +24,7 @@ int main_gtk(int argc, char ** argv){
 
   builder = gtk_builder_new();
 
-   /* Création du chemin complet pour accéder au fichier test.glade. */
+   /* Création du chemin complet pour accéder au fichier .glade. */
   /* g_build_filename(); construit le chemin complet en fonction du système */
   /* d'exploitation. */
   filename =  g_build_filename ("../window_main.glade", NULL);
@@ -81,8 +81,8 @@ int main_gtk(int argc, char ** argv){
         return;
     }
     gtk_text_buffer_insert_at_cursor (data,"Ok\n",-1);
-    init_array(tableau, ti);
-    resolution_gtk(tableau, data);
+    init_array(g_tableau, g_ti);
+    resolution_gtk(g_tableau, data);
 }
 
 void text_entered(GtkWidget *widget, gpointer data) {
@@ -94,7 +94,9 @@ void text_entered(GtkWidget *widget, gpointer data) {
   text = gtk_entry_get_text((GtkEntry*)widget);
   /*Entry field is empty or contain a number*/
   if((text[0] >= 48 && text[0] <=57) || text[0] == '\0'){
-    ti[row][col] = text[0]-48;
+    if(text[0] != 48){//Discard '0'
+      g_ti[row][col] = text[0]-48;
+    }
   }
   /*Entry field contain an invalid value*/
   else{
@@ -107,13 +109,15 @@ uint8_t resolution_gtk(struct Cellule tableau[9][9], gpointer data){
     /* Conversion ligne-colonne en un seul indice : [x][y] = [z]*/
     uint8_t indice;
     uint8_t value_set;
+    gchar nb;
     do{
         gtk_text_buffer_insert_at_cursor (data,"Computing...\n",-1);
         rvalue = calcul_valeurs_possibles(tableau, &ligne, &colonne);
-        indice = 9*colonne + ligne;
+        indice = 9 *colonne + ligne;
         if(rvalue == 1){
             value_set = set_value(&tableau[ligne][colonne]);
-            gtk_entry_set_text(array_entry[indice],GUINT_TO_POINTER(value_set));
+            nb = value_set+48;
+            gtk_entry_set_text(array_entry[indice],&nb);
         }
         else if(rvalue > 1){
             gtk_text_buffer_insert_at_cursor (data,"Number of possibilities > 1\n",-1);
@@ -123,7 +127,7 @@ uint8_t resolution_gtk(struct Cellule tableau[9][9], gpointer data){
     return rvalue; 
 }
 
-uint8_t gtk_check_values(){
+uint8_t gtk_check_values(void){
     
     for(uint8_t i = 0; i < 81; i++){
         const gchar* text = gtk_entry_get_text(array_entry[i]);

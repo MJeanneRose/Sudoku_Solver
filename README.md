@@ -1,8 +1,10 @@
 Sudoku Resolver written in C with gtk
 
-#BUILD
+# LINUX BUILD
 mkdir build && cd build
 cmake ..
 make
 
 ./Sudoku_Resolver
+
+# WINDOWS BUILD
