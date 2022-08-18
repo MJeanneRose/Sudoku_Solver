@@ -1,3 +1,0 @@
-/home/meven/Documents/Sudoku_Resolver/CMakeFiles/rebuild_cache.dir
-/home/meven/Documents/Sudoku_Resolver/CMakeFiles/edit_cache.dir
-/home/meven/Documents/Sudoku_Resolver/CMakeFiles/Sudoku_Resolver.dir
