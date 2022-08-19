@@ -101,10 +101,14 @@ void calcul_valeurs_possibles_selon_ligne(struct Cellule array[9][9], struct Cel
     for(uint8_t i=0 ; i<9 ; i++){
         for(uint8_t j=0 ; j<9 ; j++){
             if(array[i][j].valeur){//cell contains a value, don't compute the possibilities
+                min->nombre_possibilites = 0;
                 continue;
             }
             nb_possibilites = calcul_valeurs_possibles_cellule_selon_ligne(i, j, array);
-            if((nb_possibilites <= min->nombre_possibilites) && (nb_possibilites !=0)){
+            if(nb_possibilites == 0){
+                // TODO: Problem : 0 possibility and cell doesn't contain a value
+            }
+            if((nb_possibilites <= min->nombre_possibilites) || (min->nombre_possibilites == 0)){
                 *ligne = i;
                 *colonne = j;
                 if(nb_possibilites == 1){
@@ -125,10 +129,14 @@ void calcul_valeurs_possibles_selon_colonne(struct Cellule array[9][9], struct C
     for(uint8_t i=0 ; i<9 ; i++){
         for(uint8_t j=0 ; j<9 ; j++){
             if(array[i][j].valeur){//cell contains a value, don't compute the possibilities
+                min->nombre_possibilites = 0;
                 continue;
             }
             nb_possibilites = calcul_valeurs_possibles_cellule_selon_colonne(i, j, array);
-            if((nb_possibilites <= min->nombre_possibilites) && (nb_possibilites !=0)){
+            if(nb_possibilites == 0){
+                // TODO: Problem : 0 possibility and cell doesn't contain a value
+            }
+            if((nb_possibilites <= min->nombre_possibilites) || (min->nombre_possibilites == 0)){
                 *ligne = i;
                 *colonne = j;
                 if(nb_possibilites == 1){
@@ -149,7 +157,11 @@ void calcul_valeurs_possibles_selon_block(struct Cellule array[9][9], struct Cel
     for(uint8_t i = 1; i<10; i++){
         nb_possibilites = update_block(i, ligne, colonne, array);
         //printf("Number min of possibilities in block %d is %d at [%d][%d]\n",i, nb_possibilites, *ligne, *colonne);
-        if((nb_possibilites <= min->nombre_possibilites) && (nb_possibilites !=0)){
+        if(nb_possibilites == 0){
+            min->nombre_possibilites = 0;
+            continue;
+        }
+        if((nb_possibilites <= min->nombre_possibilites) || (min->nombre_possibilites == 0)){
             if(nb_possibilites == 1){
                 min->nombre_possibilites = 1;
                 return;

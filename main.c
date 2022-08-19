@@ -8,7 +8,7 @@
 #include "fonctions.h"
 #include "fonctions_gtk.h"
 
-#define USE_GTK 1
+#define USE_GTK 0
 
 #if !USE_GTK
 /*Global ti array (used to get values)*/
