@@ -13,6 +13,7 @@
 
 extern uint8_t g_ti [9][9];
 extern struct Cellule g_tableau[9][9];
+extern uint8_t recurs;
 
 /*Main to use GTK*/
 int main_gtk(int argc, char **argv);
@@ -28,5 +29,8 @@ void text_entered(GtkWidget *widget, gpointer data);
 
 /*Used to check the entiere Cellule array before performing computation*/
 uint8_t gtk_check_values(void);
+
+/*Display the array in the GTK' window*/
+void Affichage_gtk(struct Cellule const tab[9][9]);
 
 #endif

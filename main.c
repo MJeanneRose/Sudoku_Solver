@@ -8,7 +8,7 @@
 #include "fonctions.h"
 #include "fonctions_gtk.h"
 
-#define USE_GTK 0
+#define USE_GTK 1
 
 #if !USE_GTK
 /*Global ti array (used to get values)*/
@@ -29,6 +29,9 @@
 
 /*Global array (used to find values)*/
 struct Cellule g_tableau[9][9];
+
+/*Global variable to keep track of recursivity*/
+uint8_t recurs = 255;
 
 int main (__attribute__((unused))int argc, __attribute__((unused))char **argv)
 {

@@ -10,6 +10,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#define MAX_NB_RECURS 2
+
 /* Structure représentant une case contenant une valeur, nombre de possibilités, etc.*/
 struct Cellule{
   uint16_t valeurs_possibles : 9;
@@ -20,6 +22,7 @@ struct Cellule{
 
 extern uint8_t g_ti [9][9];
 extern struct Cellule g_tableau[9][9];
+extern uint8_t recurs;
 
 /*Without GTK, mainly debugging purpose*/
 void main_console(void);
@@ -73,7 +76,10 @@ void affiche_valeurs_possibles(const struct Cellule);
 */
 uint8_t resolution(struct Cellule[9][9]);
 
-/*Set value for a cell when it has only one possibility or to try a branch
+/*Set value for a cell when it has only one possibility or to try a branch (sets the 1st possibility)
 @return The value set, 0 otherwise*/
 uint8_t set_value(struct Cellule*);
+
+/*Create a new struct cellule array. Used for recursivity*/
+void copy_cell_array(const struct Cellule origin[9][9], struct Cellule new[9][9]);
 #endif

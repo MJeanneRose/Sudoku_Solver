@@ -42,6 +42,10 @@ void init_array(struct Cellule array[9][9], uint8_t const tab[9][9]){
 }
 
 uint8_t resolution(struct Cellule tableau[9][9]){
+    if(++recurs >= MAX_NB_RECURS){
+    return 42;
+  }
+    printf("Recurse step : %d\n",recurs);
     uint8_t ligne, colonne, rvalue;
     do{
         printf("Computing...\n");
@@ -55,7 +59,10 @@ uint8_t resolution(struct Cellule tableau[9][9]){
         else if(rvalue > 1){
             printf("%d possibilities at [%d][%d] : ", rvalue, ligne, colonne);
             affiche_valeurs_possibles(tableau[ligne][colonne]);
-            Affichage(tableau);
+            struct Cellule new_tableau[9][9];
+            copy_cell_array(tableau,new_tableau);
+            set_value(&new_tableau[ligne][colonne]);
+            rvalue = resolution(new_tableau);
         }
     }while(rvalue == 1);
     printf("End of the resolution\n");
@@ -282,4 +289,15 @@ void affiche_valeurs_possibles(const struct Cellule cell){
         }
     }
     printf("\n");
+}
+
+void copy_cell_array(const struct Cellule origin[9][9], struct Cellule new[9][9]){
+    for(uint8_t i=0; i<9;i++){
+        for(uint8_t j=0; j<9;j++){
+            new[i][j].nombre_possibilites = origin[i][j].nombre_possibilites;
+            new[i][j].valeurs_possibles = origin[i][j].valeurs_possibles;
+            new[i][j].valeur = origin[i][j].valeur;
+            new[i][j].padding = origin[i][j].padding;
+        }
+    }
 }

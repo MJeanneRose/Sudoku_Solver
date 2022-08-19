@@ -105,26 +105,30 @@ void text_entered(GtkWidget *widget, gpointer data) {
 }
 
 uint8_t resolution_gtk(struct Cellule tableau[9][9], gpointer data){
-    uint8_t ligne, colonne, rvalue;
-    /* Conversion ligne-colonne en un seul indice : [x][y] = [z]*/
-    uint8_t indice;
-    uint8_t value_set;
-    gchar nb;
-    do{
-        gtk_text_buffer_insert_at_cursor (data,"Computing...\n",-1);
-        rvalue = calcul_valeurs_possibles(tableau, &ligne, &colonne);
-        indice = 9 *colonne + ligne;
-        if(rvalue == 1){
-            value_set = set_value(&tableau[ligne][colonne]);
-            nb = value_set+48;
-            gtk_entry_set_text(array_entry[indice],&nb);
-        }
-        else if(rvalue > 1){
-            gtk_text_buffer_insert_at_cursor (data,"Number of possibilities > 1\n",-1);
-        }
-    }while(rvalue == 1);
-    gtk_text_buffer_insert_at_cursor (data,"End of computation.\n",-1);
-    return rvalue; 
+  if(++recurs >= MAX_NB_RECURS ){
+    return 42;
+  }
+  gchar string_buffer[18];
+  uint8_t ligne, colonne, rvalue;
+  g_snprintf(string_buffer, 18, "Recurse step : %d\n",recurs);
+  gtk_text_buffer_insert_at_cursor (data,string_buffer,-1);
+  gtk_text_buffer_insert_at_cursor (data,"Computing...\n",-1);
+  do{
+      rvalue = calcul_valeurs_possibles(tableau, &ligne, &colonne);
+      if(rvalue == 1){
+          set_value(&tableau[ligne][colonne]);
+      }
+      else if(rvalue > 1){
+          gtk_text_buffer_insert_at_cursor (data,"Number of possibilities > 1\n",-1);
+          struct Cellule new_tableau[9][9];
+          copy_cell_array(tableau,new_tableau);
+          set_value(&new_tableau[ligne][colonne]);
+          rvalue = resolution_gtk(new_tableau, data);
+      }
+  }while(rvalue == 1);
+  gtk_text_buffer_insert_at_cursor (data,"End of computation.\n",-1);
+  Affichage_gtk(tableau);
+  return rvalue; 
 }
 
 uint8_t gtk_check_values(void){
@@ -137,4 +141,18 @@ uint8_t gtk_check_values(void){
         }
     }
     return 0;
+}
+
+void Affichage_gtk(struct Cellule const tab[9][9]){
+  gchar nb;
+  /* Conversion ligne-colonne en un seul indice : [x][y] = [z]*/
+    uint8_t indice;
+    for (uint8_t i = 0; i < 9; i++)
+    {
+        for (uint8_t j = 0; j < 9; j++){
+            nb = tab[i][j].valeur + 48;
+             indice = 9 *i + j;
+             gtk_entry_set_text(array_entry[indice],&nb);
+        }
+    }
 }
