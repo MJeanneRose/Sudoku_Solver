@@ -75,14 +75,15 @@ int main_gtk(int argc, char ** argv){
 }
 
   void button_clicked(__attribute__((unused))GtkWidget *widget, gpointer data) {
+    uint8_t to_find;
     gtk_text_buffer_set_text (data,"Checking Values... ",-1);
     if(gtk_check_values()){
         gtk_text_buffer_insert_at_cursor (data,"Fail\n",-1);
         return;
     }
     gtk_text_buffer_insert_at_cursor (data,"Ok\n",-1);
-    init_array(g_tableau, g_ti);
-    resolution_gtk(g_tableau, data);
+    to_find = init_array(g_tableau, g_ti);
+    resolution_gtk(g_tableau, data, to_find);
 }
 
 void text_entered(GtkWidget *widget, gpointer data) {
@@ -104,7 +105,7 @@ void text_entered(GtkWidget *widget, gpointer data) {
   }
 }
 
-uint8_t resolution_gtk(struct Cellule tableau[9][9], gpointer data){
+uint8_t resolution_gtk(struct Cellule tableau[9][9], gpointer data, uint8_t to_find){
   if(++recurs >= MAX_NB_RECURS ){
     return 42;
   }
@@ -117,30 +118,32 @@ uint8_t resolution_gtk(struct Cellule tableau[9][9], gpointer data){
       rvalue = calcul_valeurs_possibles(tableau, &ligne, &colonne);
       if(rvalue == 1){
           set_value(&tableau[ligne][colonne]);
+          to_find--;
       }
       else if(rvalue > 1){
           gtk_text_buffer_insert_at_cursor (data,"Number of possibilities > 1\n",-1);
           struct Cellule new_tableau[9][9];
           copy_cell_array(tableau,new_tableau);
           set_value(&new_tableau[ligne][colonne]);
-          rvalue = resolution_gtk(new_tableau, data);
+          rvalue = resolution_gtk(new_tableau, data, to_find-1);
       }
   }while(rvalue == 1);
-  gtk_text_buffer_insert_at_cursor (data,"End of computation.\n",-1);
+  g_snprintf(string_buffer, 17, "End of depth %d\n",recurs);
+  gtk_text_buffer_insert_at_cursor (data, string_buffer,-1);
   Affichage_gtk(tableau);
-  return rvalue; 
+  recurs--;
+  return to_find; 
 }
 
 uint8_t gtk_check_values(void){
-    
-    for(uint8_t i = 0; i < 81; i++){
-        const gchar* text = gtk_entry_get_text(array_entry[i]);
-        /*Entry field doesn't contian a number*/
-        if((text[0] < 48 || text[0] > 57) && (text[0] != '\0')){
-            return 1;
-        }
-    }
-    return 0;
+  for(uint8_t i = 0; i < 81; i++){
+      const gchar* text = gtk_entry_get_text(array_entry[i]);
+      /*Entry field doesn't contian a number*/
+      if((text[0] < 48 || text[0] > 57) && (text[0] != '\0')){
+          return 1;
+      }
+  }
+  return 0;
 }
 
 void Affichage_gtk(struct Cellule const tab[9][9]){
@@ -149,10 +152,10 @@ void Affichage_gtk(struct Cellule const tab[9][9]){
     uint8_t indice;
     for (uint8_t i = 0; i < 9; i++)
     {
-        for (uint8_t j = 0; j < 9; j++){
-            nb = tab[i][j].valeur + 48;
-             indice = 9 *i + j;
-             gtk_entry_set_text(array_entry[indice],&nb);
-        }
+      for (uint8_t j = 0; j < 9; j++){
+          nb = tab[i][j].valeur + 48;
+            indice = 9 *j + i;
+            gtk_entry_set_text(array_entry[indice],&nb);
+      }
     }
 }

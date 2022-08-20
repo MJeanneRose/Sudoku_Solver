@@ -9,8 +9,9 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>//Only for the exit function
 
-#define MAX_NB_RECURS 2
+#define MAX_NB_RECURS 10
 
 /* Structure représentant une case contenant une valeur, nombre de possibilités, etc.*/
 struct Cellule{
@@ -32,8 +33,10 @@ void main_console(void);
 /*Display Stuct Cellule array values in the console*/
 void Affichage(struct Cellule const[9][9]);
 
-/*Init struct Cellule array with an array */
-void init_array(struct Cellule[9][9], uint8_t const tab[9][9]);
+/*Init struct Cellule array with an array
+@return Number of cells to find
+*/
+uint8_t init_array(struct Cellule[9][9], uint8_t const tab[9][9]);
 
 /*calculate and Fill "valeurs_possibles" field of the struct
 @return minimum number of possibilities*/
@@ -42,7 +45,7 @@ uint8_t calcul_valeurs_possibles(struct Cellule[9][9], uint8_t *ligne, uint8_t *
 /*Update number of possibilities thanks to number of bits set in "valeurs_possibles" field
 @return number of possibilities
 */
-uint8_t update_nb_possibilites(struct Cellule);
+uint8_t update_nb_possibilites(struct Cellule*);
 
 /*Compute possible value of each element line by line
 @return minimum number of possibility*/
@@ -66,7 +69,7 @@ uint8_t calcul_valeurs_possibles_cellule_selon_colonne(uint8_t ligne, uint8_t co
 
 /*Compute possible value of cells inside block
 @return min number of possibilities of the corresponding block*/
-uint8_t update_block(uint8_t block_number,uint8_t *ligne, uint8_t *colonne, struct Cellule array[9][9]);
+uint8_t update_block(uint8_t block_number,uint8_t *ligne, uint8_t *colonne, struct Cellule array[9][9], struct Cellule*);
 
 /*display bits field "valeurs possibles"*/
 void affiche_valeurs_possibles(const struct Cellule);
@@ -74,7 +77,7 @@ void affiche_valeurs_possibles(const struct Cellule);
 /*Entry point with console mode
 @return 0: SUCCESS i otherwise
 */
-uint8_t resolution(struct Cellule[9][9]);
+uint8_t resolution(struct Cellule[9][9], uint8_t to_find);
 
 /*Set value for a cell when it has only one possibility or to try a branch (sets the 1st possibility)
 @return The value set, 0 otherwise*/
