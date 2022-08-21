@@ -12,6 +12,8 @@
 
 #define MAX_NB_RECURS 100
 #define NB_POSSIBLE_VALUES_UNINIT 0x7F
+#define NO_POSSIBILITY_AND_NO_VALUE 42
+#define REACH_MAX_NB_RECURS 27
 
 #define DEBUG 0
 
@@ -83,7 +85,7 @@ uint8_t update_block(uint8_t block_number,uint8_t *ligne, uint8_t *colonne, stru
 void affiche_valeurs_possibles(const struct Cellule);
 
 /*Entry point with console mode
-@return 0: SUCCESS i otherwise
+@return 0 success 42 wrong branch 27 max number of recursivity reach
 */
 uint8_t resolution(struct Cellule[9][9], uint8_t to_find);
 
