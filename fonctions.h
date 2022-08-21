@@ -89,8 +89,9 @@ void affiche_valeurs_possibles(const struct Cellule);
 */
 uint8_t resolution(struct Cellule[9][9], uint8_t to_find);
 
-/*Set value for a cell when it has only one possibility or to try a branch (sets the 1st possibility)
-@return The value set, 0 otherwise*/
+/*Set value for a cell when it has only one possibility or to try a branch (sets the 1st possibility) with console mode
+@return The value set, 0 otherwise
+*/
 uint8_t set_value(struct Cellule*);
 
 /*Create a new struct cellule array. Used for recursivity*/

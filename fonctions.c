@@ -313,6 +313,7 @@ uint8_t set_value(struct Cellule *cell){
         }
     }
     return 0;
+    return 0;
 }
 
 void affiche_valeurs_possibles(const struct Cellule cell){

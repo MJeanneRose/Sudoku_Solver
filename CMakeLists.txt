@@ -1,6 +1,8 @@
 #Set projet
 cmake_minimum_required( VERSION 3.16 )
 
+set(CMAKE_C_COMPILER "gcc")
+
 project (Sudoku_Resolver LANGUAGES C VERSION 1.0)
 if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
