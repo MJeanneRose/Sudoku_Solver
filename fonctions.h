@@ -10,6 +10,19 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#define MAX_NB_RECURS 100
+#define NB_POSSIBLE_VALUES_UNINIT 0x7F
+#define NO_POSSIBILITY_AND_NO_VALUE 42
+#define REACH_MAX_NB_RECURS 27
+
+#define DEBUG 0
+
+#if DEBUG
+#define DEBUG_LOG(x) {printf(x);}
+#else
+#define DEBUG_LOG(x)
+#endif
+
 /* Structure représentant une case contenant une valeur, nombre de possibilités, etc.*/
 struct Cellule{
   uint16_t valeurs_possibles : 9;
@@ -20,6 +33,7 @@ struct Cellule{
 
 extern uint8_t g_ti [9][9];
 extern struct Cellule g_tableau[9][9];
+extern uint8_t recurs;
 
 /*Without GTK, mainly debugging purpose*/
 void main_console(void);
@@ -29,8 +43,10 @@ void main_console(void);
 /*Display Stuct Cellule array values in the console*/
 void Affichage(struct Cellule const[9][9]);
 
-/*Init struct Cellule array with an array */
-void init_array(struct Cellule[9][9], uint8_t const tab[9][9]);
+/*Init struct Cellule array with an array
+@return Number of cells to find
+*/
+uint8_t init_array(struct Cellule[9][9], uint8_t const tab[9][9]);
 
 /*calculate and Fill "valeurs_possibles" field of the struct
 @return minimum number of possibilities*/
@@ -39,7 +55,7 @@ uint8_t calcul_valeurs_possibles(struct Cellule[9][9], uint8_t *ligne, uint8_t *
 /*Update number of possibilities thanks to number of bits set in "valeurs_possibles" field
 @return number of possibilities
 */
-uint8_t update_nb_possibilites(struct Cellule);
+uint8_t update_nb_possibilites(struct Cellule*);
 
 /*Compute possible value of each element line by line
 @return minimum number of possibility*/
@@ -63,17 +79,21 @@ uint8_t calcul_valeurs_possibles_cellule_selon_colonne(uint8_t ligne, uint8_t co
 
 /*Compute possible value of cells inside block
 @return min number of possibilities of the corresponding block*/
-uint8_t update_block(uint8_t block_number,uint8_t *ligne, uint8_t *colonne, struct Cellule array[9][9]);
+uint8_t update_block(uint8_t block_number,uint8_t *ligne, uint8_t *colonne, struct Cellule array[9][9], struct Cellule*);
 
 /*display bits field "valeurs possibles"*/
 void affiche_valeurs_possibles(const struct Cellule);
 
 /*Entry point with console mode
-@return 0: SUCCESS i otherwise
+@return 0 success 42 wrong branch 27 max number of recursivity reach
 */
-uint8_t resolution(struct Cellule[9][9]);
+uint8_t resolution(struct Cellule[9][9], uint8_t to_find);
 
-/*Set value for a cell when it has only one possibility or to try a branch
-@return The value set, 0 otherwise*/
+/*Set value for a cell when it has only one possibility or to try a branch (sets the 1st possibility) with console mode
+@return The value set, 0 otherwise
+*/
 uint8_t set_value(struct Cellule*);
+
+/*Create a new struct cellule array. Used for recursivity*/
+void copy_cell_array(const struct Cellule origin[9][9], struct Cellule new[9][9]);
 #endif

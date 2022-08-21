@@ -12,6 +12,7 @@
 
 #if !USE_GTK
 /*Global ti array (used to get values)*/
+/*
   uint8_t g_ti [9][9] =   {{0, 0, 9, 0, 0, 2, 0, 0, 5},
                     {5, 3, 8, 0, 6, 4, 0, 0, 9},
                     {1, 6, 2, 0, 0, 0, 0, 3, 0},
@@ -22,6 +23,18 @@
                     {7, 0, 0, 3, 0, 0, 8, 5, 0},
                     {0, 9, 1, 0, 0, 0, 4, 7, 0}
   };
+  */
+ uint8_t g_ti [9][9] ={
+                      {0, 0, 7, 0, 0, 0, 0, 0, 6},
+                      {0, 0, 0, 0, 8, 0, 0, 0, 0},
+                      {6, 0, 0, 0, 5, 4, 1, 0, 0},
+                      {0, 0, 9, 0, 4, 3, 0, 5, 0},
+                      {0, 0, 0, 7, 0, 0, 3, 0, 0},
+                      {4, 0, 0, 8, 0, 0, 0, 0, 0},
+                      {0, 2, 0, 0, 0, 0, 0, 9, 0},
+                      {7, 0, 0, 0, 6, 1, 5, 0, 0},
+                      {0, 0, 0, 3, 0, 0, 0, 0, 0}
+  };
 #else
 /*Global ti array (used to get values)*/
   uint8_t g_ti [9][9] = {0};
@@ -29,6 +42,9 @@
 
 /*Global array (used to find values)*/
 struct Cellule g_tableau[9][9];
+
+/*Global variable to keep track of recursivity*/
+uint8_t recurs = 255;
 
 int main (__attribute__((unused))int argc, __attribute__((unused))char **argv)
 {
