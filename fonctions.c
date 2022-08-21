@@ -9,7 +9,9 @@
 void main_console(void){
     uint8_t to_find;
     to_find = init_array(g_tableau, g_ti);
+    printf("Indices begin at 0 [line][column]\n");
     Affichage(g_tableau);
+    printf("Values to find : %d\n", to_find);
     resolution(g_tableau, to_find);
 }
 
@@ -47,68 +49,85 @@ uint8_t init_array(struct Cellule array[9][9], uint8_t const tab[9][9]){
 
 uint8_t resolution(struct Cellule tableau[9][9], uint8_t to_find){
     if(++recurs >= MAX_NB_RECURS){
-    return 42;
+        recurs--;
+        return 42;
   }
-    printf("Recurse step : %d\n",recurs);
-    uint8_t ligne, colonne, rvalue;
-    printf("Computing...\n");
+    uint8_t ligne, colonne, rvalue, value_set;
+    printf("Computing step %d...\n", recurs);
     do{
         rvalue = calcul_valeurs_possibles(tableau, &ligne, &colonne);
-        if(rvalue == 1){
-            printf("Value found at [%d][%d] : ",ligne, colonne);
+        if(rvalue == 1){//Only one value possible
+            printf("Step %d - Value found at [%d][%d] : ",recurs,ligne, colonne);
             affiche_valeurs_possibles(tableau[ligne][colonne]);
             set_value(&tableau[ligne][colonne]);
             to_find--;
-            Affichage(tableau);
         }
         else if(rvalue > 1){
-            printf("%d possibilities at [%d][%d] : ", rvalue, ligne, colonne);
+            if(rvalue == 42){//Wrong branch quit
+                printf("Wrong branch\n");
+                recurs--;
+                return 42;
+            }
+            printf("Step %d - %d possibilities at [%d][%d] : ", recurs, rvalue, ligne, colonne);
             affiche_valeurs_possibles(tableau[ligne][colonne]);
             struct Cellule new_tableau[9][9];
-            copy_cell_array(tableau,new_tableau);
-            set_value(&new_tableau[ligne][colonne]);
-            rvalue = resolution(new_tableau, to_find-1);
+            do{
+                copy_cell_array(tableau,new_tableau);
+                value_set = set_value(&new_tableau[ligne][colonne]);
+                rvalue = resolution(new_tableau, to_find-1);
+                if (rvalue == 42){
+                    tableau[ligne][colonne].valeurs_possibles &= ~(0x100 >> (value_set-1));
+                    if(tableau[ligne][colonne].valeurs_possibles == 0){
+                        recurs--;
+                        return 42;
+                    }
+                    printf("step %d try with value %d\n",recurs,tableau[ligne][colonne].valeurs_possibles);
+                }
+            }while(rvalue == 42);
+            copy_cell_array(new_tableau, tableau);
         }
     }while(rvalue == 1);
-    printf("End of the resolution depth %d :\n",recurs);
-    Affichage(tableau);
+    printf("End of the resolution depth %d\n",recurs);
+    if(recurs == 0){
+        Affichage(tableau);
+    }
     recurs--;
-    return to_find;
+    return rvalue;
     
 }
 
 uint8_t calcul_valeurs_possibles(struct Cellule array[9][9], uint8_t *ligne, uint8_t *colonne){
     struct Cellule minimum;
-    minimum.nombre_possibilites = 9;
+    minimum.nombre_possibilites = NB_POSSIBLE_VALUES_UNINIT;
     minimum.valeurs_possibles = 0x1FF;
 
-    printf("Line calculation...\n");
+    DEBUG_LOG("Line calculation...\n")
     calcul_valeurs_possibles_selon_ligne(array, &minimum, ligne, colonne);
-    printf("Ok\n");
-    if(minimum.nombre_possibilites == 1){
-        return 1;
+    DEBUG_LOG("Ok\n");
+    if(minimum.nombre_possibilites == 1 || minimum.nombre_possibilites == 42){
+        return minimum.nombre_possibilites;
     }
-    printf("Number of possibilities min : %d at [%d][%d] : ", minimum.nombre_possibilites, *ligne, *colonne);
-    affiche_valeurs_possibles(array[*ligne][*colonne]);
 
-    printf("Column calculation...\n");
+    DEBUG_LOG("Column calculation...\n");
     calcul_valeurs_possibles_selon_colonne(array, &minimum, ligne, colonne);
-    printf("Ok\n");
-    if(minimum.nombre_possibilites == 1){
-        return 1;
+    DEBUG_LOG("Ok\n");
+    if(minimum.nombre_possibilites == 1 || minimum.nombre_possibilites == 42){
+        return minimum.nombre_possibilites;
     }
-    printf("Number of possibilities min : %d at [%d][%d]\n", minimum.nombre_possibilites, *ligne, *colonne);
-    affiche_valeurs_possibles(array[*ligne][*colonne]);
 
-    printf("Block calculation...\n");
+    DEBUG_LOG("Block calculation...\n");
     calcul_valeurs_possibles_selon_block(array, &minimum, ligne, colonne);
-    printf("Ok\n");
-    if(minimum.nombre_possibilites == 1){
-        return 1;
+    DEBUG_LOG("Ok\n");
+    if(minimum.nombre_possibilites == 1 || minimum.nombre_possibilites == 42){
+        return minimum.nombre_possibilites;
     }
-    printf("Number of possibilities min : %d at [%d][%d]\n", minimum.nombre_possibilites, *ligne, *colonne);
 
-    return minimum.nombre_possibilites;
+    if(minimum.nombre_possibilites == NB_POSSIBLE_VALUES_UNINIT){//Init value didn't change -> array is ful
+        return 0;
+    }
+    else{
+        return minimum.nombre_possibilites;
+    }
 }
 
 void calcul_valeurs_possibles_selon_ligne(struct Cellule array[9][9], struct Cellule *min, uint8_t *ligne, uint8_t *colonne){
@@ -120,7 +139,9 @@ void calcul_valeurs_possibles_selon_ligne(struct Cellule array[9][9], struct Cel
             }
             nb_possibilites = calcul_valeurs_possibles_cellule_selon_ligne(i, j, array);
             if(nb_possibilites == 0){
-                // TODO: Problem : 0 possibility and cell doesn't contain a value
+                //Problem : 0 possibility and cell doesn't contain a value
+                min->nombre_possibilites = 42;
+                return;
             }
             if((nb_possibilites <= min->nombre_possibilites) || (min->nombre_possibilites == 0)){
                 *ligne = i;
@@ -135,8 +156,6 @@ void calcul_valeurs_possibles_selon_ligne(struct Cellule array[9][9], struct Cel
                 }
             }
         }
-        printf("Possibilites sur la ligne %d: ",i);
-        affiche_valeurs_possibles(array[i][8]);
     }
 }
 
@@ -149,7 +168,9 @@ void calcul_valeurs_possibles_selon_colonne(struct Cellule array[9][9], struct C
             }
             nb_possibilites = calcul_valeurs_possibles_cellule_selon_colonne(i, j, array);
             if(nb_possibilites == 0){
-                // TODO: Problem : 0 possibility and cell doesn't contain a value
+                // Problem : 0 possibility and cell doesn't contain a value
+                min->nombre_possibilites = 42;
+                return;
             }
             if((nb_possibilites <= min->nombre_possibilites) || (min->nombre_possibilites == 0)){
                 *ligne = i;
@@ -164,8 +185,6 @@ void calcul_valeurs_possibles_selon_colonne(struct Cellule array[9][9], struct C
                 }
             }
         }
-        printf("Possibilites sur la colonne %d: ",i);
-        affiche_valeurs_possibles(array[i][8]);
     }
 }
 
@@ -173,8 +192,7 @@ void calcul_valeurs_possibles_selon_block(struct Cellule array[9][9], struct Cel
     uint8_t nb_possibilites;
     for(uint8_t i = 1; i<10; i++){
         nb_possibilites = update_block(i, ligne, colonne, array, min);
-        printf("Number min of possibilities in block %d is %d at [%d][%d]\n",i, nb_possibilites, *ligne, *colonne);
-        if(nb_possibilites == 1){
+        if(nb_possibilites == 1 || nb_possibilites == 42){
             return;
         }
     }
@@ -184,11 +202,10 @@ uint8_t calcul_valeurs_possibles_cellule_selon_ligne(uint8_t ligne, uint8_t col,
     uint8_t val;
     for(uint8_t column = 0; column <9; column++){
         val = array[ligne][column].valeur;
-        if((column == col) || (val==0))
+        if((column == col) || (val==0)){
             continue;
-
+        }
         array[ligne][col].valeurs_possibles &= ~(0x100 >> (val-1));
-        //printf("%d detecte, masque : %x\n", val, ~(0x100 >> (val-1)));
     }
     return update_nb_possibilites(&array[ligne][col]);
 }
@@ -198,11 +215,10 @@ uint8_t calcul_valeurs_possibles_cellule_selon_colonne(uint8_t ligne, uint8_t co
     
     for(uint8_t line = 0; line <9; line++){
         val = array[line][colonne].valeur;
-        if((line == ligne) || (val==0))
+        if((line == ligne) || (val==0)){
             continue;
-
+        }
         array[ligne][colonne].valeurs_possibles &= ~(0x100 >> (val-1));
-        //printf("%d detecte, masque : %x\n", val, ~(0x100 >> (val-1)));
     }
     return update_nb_possibilites(&array[ligne][colonne]);
 }
@@ -234,7 +250,7 @@ uint8_t update_block(uint8_t block_number,uint8_t *ligne, uint8_t *colonne, stru
     for(i = ligne_start; i<ligne_start+3; i++){/*Compute mask*/
         for(j = colonne_start; j<colonne_start+3; j++){
             val = array[i][j].valeur;
-            if(val == 0){
+            if(val == 0){//Cell doesn't contain value, nothing to add to the mask
                 continue;
             }
             masque &= ~(0x100 >> (val-1)); 
@@ -242,11 +258,16 @@ uint8_t update_block(uint8_t block_number,uint8_t *ligne, uint8_t *colonne, stru
     }
     for(i = ligne_start; i<ligne_start+3; i++){/*Apply mask*/
         for(j = colonne_start; j<colonne_start+3; j++){
-            if(array[i][j].valeur != 0){
+            if(array[i][j].valeur != 0){//Cell contains a value, don't apply mask
                 continue;
             }
             array[i][j].valeurs_possibles &= masque;
             nb_possibilites = update_nb_possibilites(&array[i][j]);
+            if(nb_possibilites == 0){
+                //Cell doesn't contain a value and possibility = 0
+                min->nombre_possibilites = 42;
+                return 42;
+            }
             if(nb_possibilites <= min->nombre_possibilites){
                 *ligne = i;
                 *colonne = j;
@@ -290,13 +311,13 @@ void affiche_valeurs_possibles(const struct Cellule cell){
     printf("\n");
 }
 
-void copy_cell_array(const struct Cellule origin[9][9], struct Cellule new[9][9]){
+void copy_cell_array(const struct Cellule origin[9][9], struct Cellule new_tab[9][9]){
     for(uint8_t i=0; i<9;i++){
         for(uint8_t j=0; j<9;j++){
-            new[i][j].nombre_possibilites = origin[i][j].nombre_possibilites;
-            new[i][j].valeurs_possibles = origin[i][j].valeurs_possibles;
-            new[i][j].valeur = origin[i][j].valeur;
-            new[i][j].padding = origin[i][j].padding;
+            new_tab[i][j].nombre_possibilites = origin[i][j].nombre_possibilites;
+            new_tab[i][j].valeurs_possibles = origin[i][j].valeurs_possibles;
+            new_tab[i][j].valeur = origin[i][j].valeur;
+            new_tab[i][j].padding = origin[i][j].padding;
         }
     }
 }

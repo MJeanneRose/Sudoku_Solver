@@ -107,6 +107,7 @@ void text_entered(GtkWidget *widget, gpointer data) {
 
 uint8_t resolution_gtk(struct Cellule tableau[9][9], gpointer data, uint8_t to_find){
   if(++recurs >= MAX_NB_RECURS ){
+    recurs--;
     return 42;
   }
   gchar string_buffer[18];

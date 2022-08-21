@@ -9,9 +9,17 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>//Only for the exit function
 
-#define MAX_NB_RECURS 10
+#define MAX_NB_RECURS 100
+#define NB_POSSIBLE_VALUES_UNINIT 0x7F
+
+#define DEBUG 0
+
+#if DEBUG
+#define DEBUG_LOG(x) {printf(x);}
+#else
+#define DEBUG_LOG(x)
+#endif
 
 /* Structure représentant une case contenant une valeur, nombre de possibilités, etc.*/
 struct Cellule{
