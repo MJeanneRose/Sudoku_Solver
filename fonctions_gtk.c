@@ -96,7 +96,7 @@ void text_entered(GtkWidget *widget, gpointer data) {
   col = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget),"col"));
   
   text = gtk_entry_get_text((GtkEntry*)widget);
-  /* Entry field is empty or contain a number */
+  /*  Entry field is empty or contain a number  */
   if((text[0] >= 48 && text[0] <=57) || text[0] == '\0'){
     if(text[0] != 48){//Discard '0'
       g_ti[row][col] = text[0]-48;
