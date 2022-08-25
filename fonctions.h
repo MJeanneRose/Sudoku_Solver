@@ -15,7 +15,7 @@
 #define NO_POSSIBILITY_AND_NO_VALUE 42
 #define REACH_MAX_NB_RECURS 27
 
-#define DEBUG 0
+#define DEBUG 1
 
 #if DEBUG
 #define DEBUG_LOG(x) {printf(x);}
@@ -58,12 +58,12 @@ uint8_t calcul_valeurs_possibles(struct Cellule[9][9], uint8_t *ligne, uint8_t *
 uint8_t update_nb_possibilites(struct Cellule*);
 
 /*Compute possible value of each element line by line
-@return minimum number of possibility*/
-void calcul_valeurs_possibles_selon_ligne(struct Cellule[9][9], struct Cellule*, uint8_t*, uint8_t*);
+@return 0 or 42 if no possibility*/
+uint16_t calcul_valeurs_possibles_selon_ligne(struct Cellule[9][9]);
 
 /*Compute possible value of each element column by column
-@return minimum number of possibility*/
-void calcul_valeurs_possibles_selon_colonne(struct Cellule[9][9], struct Cellule*, uint8_t*, uint8_t*);
+@return 0 or 42 if no possibility*/
+uint16_t calcul_valeurs_possibles_selon_colonne(struct Cellule[9][9]);
 
 /*Compute possible value of each element block by block
 @return minimum number of possibility*/
@@ -87,7 +87,7 @@ void affiche_valeurs_possibles(const struct Cellule);
 /*Entry point with console mode
 @return 0 success 42 wrong branch 27 max number of recursivity reach
 */
-uint8_t resolution(struct Cellule[9][9], uint8_t to_find);
+uint8_t resolution(struct Cellule[9][9]);
 
 /*Set value for a cell when it has only one possibility or to try a branch (sets the 1st possibility) with console mode
 @return The value set, 0 otherwise
@@ -96,4 +96,7 @@ uint8_t set_value(struct Cellule*);
 
 /*Create a new struct cellule array. Used for recursivity*/
 void copy_cell_array(const struct Cellule origin[9][9], struct Cellule new[9][9]);
+
+/*Reset "valeur_possible" and "nombre_possibilite" field*/
+void clean_array(struct Cellule array[9][9]);
 #endif

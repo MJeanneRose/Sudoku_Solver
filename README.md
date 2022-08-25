@@ -11,3 +11,6 @@ make
 
 # WINDOWS BUILD
 Built with MSYS : ok
+
+# INFOS
+Tested with arrays from https://sudoku.com/
