@@ -90,10 +90,7 @@ uint8_t resolution(struct Cellule tableau[9][9]){
         }
         else{
             recurs--;
-            if(rvalue == NO_POSSIBILITY_AND_NO_VALUE){
-                printf("Wrong branch\n");
-            }
-            else{
+            if(rvalue != NO_POSSIBILITY_AND_NO_VALUE){
                 printf("Unknow : Program fail\n");
             }
             return rvalue;

@@ -87,7 +87,7 @@ void affiche_valeurs_possibles(const struct Cellule);
 /*Entry point with console mode
 @return 0 success 42 wrong branch 27 max number of recursivity reach
 */
-uint8_t resolution(struct Cellule[9][9], uint8_t to_find);
+uint8_t resolution(struct Cellule[9][9]);
 
 /*Set value for a cell when it has only one possibility or to try a branch (sets the 1st possibility) with console mode
 @return The value set, 0 otherwise

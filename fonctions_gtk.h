@@ -19,7 +19,7 @@ extern uint8_t recurs;
 int main_gtk(int argc, char **argv);
 
 /*Entry point with GTK, display some info in the textView*/
-uint8_t resolution_gtk(struct Cellule tableau[9][9], gpointer data, uint8_t to_find);
+uint8_t resolution_gtk(struct Cellule tableau[9][9], gpointer data);
 
 /*Check fields and begins computation when main button is clicked*/
 void button_clicked(GtkWidget *widget, gpointer data);
