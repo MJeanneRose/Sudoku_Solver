@@ -76,6 +76,7 @@ int main_gtk(int argc, char ** argv){
 
   void button_clicked(__attribute__((unused))GtkWidget *widget, gpointer data) {
     uint8_t to_find;
+    gchar string_buffer[23];
     gtk_text_buffer_set_text (data,"Checking Values... ",-1);
     if(gtk_check_values()){
         gtk_text_buffer_insert_at_cursor (data,"Fail\n",-1);
@@ -83,7 +84,9 @@ int main_gtk(int argc, char ** argv){
     }
     gtk_text_buffer_insert_at_cursor (data,"Ok\n",-1);
     to_find = init_array(g_tableau, g_ti);
-    resolution_gtk(g_tableau, data, to_find);
+    g_snprintf(string_buffer, 23, "Values to find : %d/81\n", to_find);
+    gtk_text_buffer_insert_at_cursor (data,string_buffer,-1);
+    resolution_gtk(g_tableau, data);
 }
 
 void text_entered(GtkWidget *widget, gpointer data) {
@@ -105,33 +108,27 @@ void text_entered(GtkWidget *widget, gpointer data) {
   }
 }
 
-uint8_t resolution_gtk(struct Cellule tableau[9][9], gpointer data, uint8_t to_find){
+uint8_t resolution_gtk(struct Cellule tableau[9][9], gpointer data){
   if(++recurs >= MAX_NB_RECURS ){
     recurs--;
     return REACH_MAX_NB_RECURS;
   }
-  gchar string_buffer[18];
   uint8_t ligne, colonne, rvalue, value_set;
-
-  g_snprintf(string_buffer, 18, "Recurse step : %d\n",recurs);
-  gtk_text_buffer_insert_at_cursor (data,string_buffer,-1);
-  gtk_text_buffer_insert_at_cursor (data,"Computing...\n",-1);
   do{
+      //clean_array(tableau);
       rvalue = calcul_valeurs_possibles(tableau, &ligne, &colonne);
       if(rvalue == 0){//All values found
 
       }
       else if(rvalue == 1){//Only one value possible
           set_value(&tableau[ligne][colonne]);
-          to_find--;
       }
       else if(rvalue > 1 && rvalue < 10){//Many possibilities
-          gtk_text_buffer_insert_at_cursor (data,"Number of possibilities > 1\n",-1);
           struct Cellule new_tableau[9][9];
           do{
             copy_cell_array(tableau,new_tableau);
             value_set = set_value(&new_tableau[ligne][colonne]);
-            rvalue = resolution_gtk(new_tableau, data, to_find-1);
+            rvalue = resolution_gtk(new_tableau, data);
             if (rvalue == NO_POSSIBILITY_AND_NO_VALUE){
               tableau[ligne][colonne].valeurs_possibles &= ~(0x100 >> (value_set-1));
               if(tableau[ligne][colonne].valeurs_possibles == 0){
@@ -147,18 +144,13 @@ uint8_t resolution_gtk(struct Cellule tableau[9][9], gpointer data, uint8_t to_f
           }
             else{
               recurs--;
-              if(rvalue == NO_POSSIBILITY_AND_NO_VALUE){
-                //printf("Wrong branch\n");
-            }
-            else{
-                printf("Unknow : Program fail\n");
-            }
+              if(rvalue != NO_POSSIBILITY_AND_NO_VALUE){
+                gtk_text_buffer_insert_at_cursor (data,"Unknow error : program fail\n",-1);
+              }
             return rvalue;
             }
       
   }while(rvalue == 1);
-  g_snprintf(string_buffer, 17, "End of depth %d\n",recurs);
-  gtk_text_buffer_insert_at_cursor (data, string_buffer,-1);
   if(recurs == 0){
   Affichage_gtk(tableau);
   }

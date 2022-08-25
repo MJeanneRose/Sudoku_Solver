@@ -12,7 +12,7 @@ void main_console(void){
     printf("Indices begin at 0 [line][column]\n");
     Affichage(g_tableau);
     printf("Values to find : %d/81\n", to_find);
-    resolution(g_tableau, to_find);
+    resolution(g_tableau);
 }
 
 void Affichage(struct Cellule const tab[9][9])
@@ -47,7 +47,7 @@ uint8_t init_array(struct Cellule array[9][9], uint8_t const tab[9][9]){
     return to_find;
 }
 
-uint8_t resolution(struct Cellule tableau[9][9], uint8_t to_find){
+uint8_t resolution(struct Cellule tableau[9][9]){
     if(++recurs >= MAX_NB_RECURS){
         recurs--;
         return REACH_MAX_NB_RECURS;
@@ -55,6 +55,7 @@ uint8_t resolution(struct Cellule tableau[9][9], uint8_t to_find){
     uint8_t ligne, colonne, rvalue, value_set;
     printf("Computing step %d...\n", recurs);
     do{
+        //clean_array(tableau);
         rvalue = calcul_valeurs_possibles(tableau, &ligne, &colonne);
         if(rvalue == 0){//All values found
 
@@ -62,8 +63,8 @@ uint8_t resolution(struct Cellule tableau[9][9], uint8_t to_find){
         else if(rvalue == 1){//Only one value possible
             printf("Step %d - Value found at [%d][%d] : ",recurs,ligne, colonne);
             affiche_valeurs_possibles(tableau[ligne][colonne]);
+            Affichage(tableau);
             set_value(&tableau[ligne][colonne]);
-            to_find--;
         }
         else if(rvalue > 1 && rvalue < 10){//Many possibilities     
             printf("Step %d - %d possibilities at [%d][%d] : ", recurs, rvalue, ligne, colonne);
@@ -72,7 +73,7 @@ uint8_t resolution(struct Cellule tableau[9][9], uint8_t to_find){
             do{
                 copy_cell_array(tableau,new_tableau);
                 value_set = set_value(&new_tableau[ligne][colonne]);
-                rvalue = resolution(new_tableau, to_find-1);
+                rvalue = resolution(new_tableau);
                 if (rvalue == NO_POSSIBILITY_AND_NO_VALUE){
                     tableau[ligne][colonne].valeurs_possibles &= ~(0x100 >> (value_set-1));
                     if(tableau[ligne][colonne].valeurs_possibles == 0){
@@ -98,7 +99,7 @@ uint8_t resolution(struct Cellule tableau[9][9], uint8_t to_find){
             return rvalue;
         }
     }while(rvalue == 1);
-    printf("End of the resolution depth %d\n",recurs);
+    printf("End of depth %d\n",recurs);
     if(recurs == 0){
         Affichage(tableau);
     }
@@ -110,19 +111,20 @@ uint8_t calcul_valeurs_possibles(struct Cellule array[9][9], uint8_t *ligne, uin
     struct Cellule minimum;
     minimum.nombre_possibilites = NB_POSSIBLE_VALUES_UNINIT;
     minimum.valeurs_possibles = 0x1FF;
+    uint16_t rvalue;
 
     DEBUG_LOG("Line calculation...\n")
-    calcul_valeurs_possibles_selon_ligne(array, &minimum, ligne, colonne);
+    rvalue = calcul_valeurs_possibles_selon_ligne(array);
     DEBUG_LOG("Ok\n");
-    if(minimum.nombre_possibilites == 1 || minimum.nombre_possibilites == NO_POSSIBILITY_AND_NO_VALUE){
-        return minimum.nombre_possibilites;
+    if(rvalue == NO_POSSIBILITY_AND_NO_VALUE){
+        return rvalue;
     }
 
     DEBUG_LOG("Column calculation...\n");
-    calcul_valeurs_possibles_selon_colonne(array, &minimum, ligne, colonne);
+    rvalue = calcul_valeurs_possibles_selon_colonne(array);
     DEBUG_LOG("Ok\n");
-    if(minimum.nombre_possibilites == 1 || minimum.nombre_possibilites == NO_POSSIBILITY_AND_NO_VALUE){
-        return minimum.nombre_possibilites;
+    if(rvalue == NO_POSSIBILITY_AND_NO_VALUE){
+        return rvalue;
     }
 
     DEBUG_LOG("Block calculation...\n");
@@ -141,7 +143,7 @@ uint8_t calcul_valeurs_possibles(struct Cellule array[9][9], uint8_t *ligne, uin
     }
 }
 
-void calcul_valeurs_possibles_selon_ligne(struct Cellule array[9][9], struct Cellule *min, uint8_t *ligne, uint8_t *colonne){
+uint16_t calcul_valeurs_possibles_selon_ligne(struct Cellule array[9][9]){
     uint8_t nb_possibilites;
     for(uint8_t i=0 ; i<9 ; i++){
         for(uint8_t j=0 ; j<9 ; j++){
@@ -152,26 +154,14 @@ void calcul_valeurs_possibles_selon_ligne(struct Cellule array[9][9], struct Cel
             nb_possibilites = calcul_valeurs_possibles_cellule_selon_ligne(i, j, array);
             if(nb_possibilites == 0){
                 /* Problem : 0 possibility and cell doesn't contain a value */
-                min->nombre_possibilites = NO_POSSIBILITY_AND_NO_VALUE;
-                return;
-            }
-            if((nb_possibilites <= min->nombre_possibilites) || (min->nombre_possibilites == 0)){
-                *ligne = i;
-                *colonne = j;
-                if(nb_possibilites == 1){
-                    min->nombre_possibilites = 1;
-                    return;
-                }
-                else{
-                    min->nombre_possibilites = nb_possibilites;
-                    min->valeurs_possibles = array[i][j].valeurs_possibles;
-                }
+                return NO_POSSIBILITY_AND_NO_VALUE;
             }
         }
     }
+    return 0;
 }
 
-void calcul_valeurs_possibles_selon_colonne(struct Cellule array[9][9], struct Cellule *min, uint8_t *ligne, uint8_t *colonne){
+uint16_t calcul_valeurs_possibles_selon_colonne(struct Cellule array[9][9]){
     uint8_t nb_possibilites;
     for(uint8_t i=0 ; i<9 ; i++){
         for(uint8_t j=0 ; j<9 ; j++){
@@ -182,23 +172,11 @@ void calcul_valeurs_possibles_selon_colonne(struct Cellule array[9][9], struct C
             nb_possibilites = calcul_valeurs_possibles_cellule_selon_colonne(i, j, array);
             if(nb_possibilites == 0){
                 /* Problem : 0 possibility and cell doesn't contain a value */
-                min->nombre_possibilites = NO_POSSIBILITY_AND_NO_VALUE;
-                return;
-            }
-            if((nb_possibilites <= min->nombre_possibilites) || (min->nombre_possibilites == 0)){
-                *ligne = i;
-                *colonne = j;
-                if(nb_possibilites == 1){
-                    min->nombre_possibilites = 1;
-                    return;
-                }
-                else{
-                    min->nombre_possibilites = nb_possibilites;
-                    min->valeurs_possibles = array[i][j].valeurs_possibles;
-                }
+                return NO_POSSIBILITY_AND_NO_VALUE;
             }
         }
     }
+    return 0;
 }
 
 void calcul_valeurs_possibles_selon_block(struct Cellule array[9][9], struct Cellule *min, uint8_t *ligne, uint8_t *colonne){
@@ -211,28 +189,28 @@ void calcul_valeurs_possibles_selon_block(struct Cellule array[9][9], struct Cel
     }
 }
 
-uint8_t calcul_valeurs_possibles_cellule_selon_ligne(uint8_t ligne, uint8_t col, struct Cellule array[9][9]){
+uint8_t calcul_valeurs_possibles_cellule_selon_ligne(uint8_t ligne_fixe, uint8_t colonne_fixe, struct Cellule array[9][9]){
     uint8_t val;
     for(uint8_t column = 0; column <9; column++){
-        val = array[ligne][column].valeur;
-        if((column == col) || (val==0)){
+        val = array[ligne_fixe][column].valeur;
+        if((column == colonne_fixe) || (val==0)){
             continue;
         }
-        array[ligne][col].valeurs_possibles &= ~(0x100 >> (val-1));
+        array[ligne_fixe][colonne_fixe].valeurs_possibles &= ~(0x100 >> (val-1));
     }
-    return update_nb_possibilites(&array[ligne][col]);
+    return update_nb_possibilites(&array[ligne_fixe][colonne_fixe]);
 }
 
-uint8_t calcul_valeurs_possibles_cellule_selon_colonne(uint8_t ligne, uint8_t colonne, struct Cellule array[9][9]){
+uint8_t calcul_valeurs_possibles_cellule_selon_colonne(uint8_t ligne_fixe, uint8_t colonne_fixe, struct Cellule array[9][9]){
     uint8_t val;
     for(uint8_t line = 0; line <9; line++){
-        val = array[line][colonne].valeur;
-        if((line == ligne) || (val==0)){
+        val = array[line][colonne_fixe].valeur;
+        if((line == ligne_fixe) || (val==0)){
             continue;
         }
-        array[ligne][colonne].valeurs_possibles &= ~(0x100 >> (val-1));
+        array[ligne_fixe][colonne_fixe].valeurs_possibles &= ~(0x100 >> (val-1));
     }
-    return update_nb_possibilites(&array[ligne][colonne]);
+    return update_nb_possibilites(&array[ligne_fixe][colonne_fixe]);
 }
 
 uint8_t update_block(uint8_t block_number,uint8_t *ligne, uint8_t *colonne, struct Cellule array[9][9], struct Cellule *min){
@@ -313,7 +291,6 @@ uint8_t set_value(struct Cellule *cell){
         }
     }
     return 0;
-    return 0;
 }
 
 void affiche_valeurs_possibles(const struct Cellule cell){
@@ -332,6 +309,21 @@ void copy_cell_array(const struct Cellule origin[9][9], struct Cellule new_tab[9
             new_tab[i][j].valeurs_possibles = origin[i][j].valeurs_possibles;
             new_tab[i][j].valeur = origin[i][j].valeur;
             new_tab[i][j].padding = origin[i][j].padding;
+        }
+    }
+}
+
+void clean_array(struct Cellule array[9][9]){
+    for(uint8_t i = 0; i < 9; i++){
+        for(uint8_t j=0; j<9; j++){
+            if(array[i][j].valeur == 0){
+                array[i][j].valeurs_possibles = 0x1FF;
+                array[i][j].nombre_possibilites = 9;
+            }
+            else{ /*value is present, nothing is possible*/
+                array[i][j].nombre_possibilites = 0;
+                array[i][j].valeurs_possibles = 0;
+            }
         }
     }
 }
