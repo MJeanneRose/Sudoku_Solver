@@ -15,7 +15,7 @@
 #define NO_POSSIBILITY_AND_NO_VALUE 42
 #define REACH_MAX_NB_RECURS 27
 
-#define DEBUG 1
+#define DEBUG 0
 
 #if DEBUG
 #define DEBUG_LOG(x) {printf(x);}
