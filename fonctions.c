@@ -105,9 +105,7 @@ uint8_t resolution(struct Cellule tableau[9][9]){
 }
 
 uint8_t calcul_valeurs_possibles(struct Cellule array[9][9], uint8_t *ligne, uint8_t *colonne){
-    struct Cellule minimum;
-    minimum.nombre_possibilites = NB_POSSIBLE_VALUES_UNINIT;
-    minimum.valeurs_possibles = 0x1FF;
+    uint16_t minimum_nb_possibilites = NB_POSSIBLE_VALUES_UNINIT;
     uint16_t rvalue;
 
     DEBUG_LOG("Line calculation...\n")
@@ -125,34 +123,42 @@ uint8_t calcul_valeurs_possibles(struct Cellule array[9][9], uint8_t *ligne, uin
     }
 
     DEBUG_LOG("Block calculation...\n");
-    calcul_valeurs_possibles_selon_block(array, &minimum, ligne, colonne);
+    minimum_nb_possibilites = calcul_valeurs_possibles_selon_block(array, ligne, colonne);
     DEBUG_LOG("Ok\n");
-    if(minimum.nombre_possibilites == 1 || minimum.nombre_possibilites == NO_POSSIBILITY_AND_NO_VALUE){
-        return minimum.nombre_possibilites;
-    }
 
 /* Init value didn't change -> Array is full */
-    if(minimum.nombre_possibilites == NB_POSSIBLE_VALUES_UNINIT){
-        return 0;
+    if(minimum_nb_possibilites != NB_POSSIBLE_VALUES_UNINIT){
+        return minimum_nb_possibilites;
     }
     else{
-        return minimum.nombre_possibilites;
+        return 0;
     }
 }
 
 uint16_t calcul_valeurs_possibles_selon_ligne(struct Cellule array[9][9]){
     uint8_t nb_possibilites;
-    for(uint8_t i=0 ; i<9 ; i++){
-        for(uint8_t j=0 ; j<9 ; j++){
-            /* Cell contains a value, don't compute the possibilities */
-            if(array[i][j].valeur){
-                continue;
+    uint8_t val;
+    uint16_t masque;
+    for(uint8_t ligne = 0; ligne < 9; ligne++){
+        masque = 0x1FF;
+        for(uint8_t colonne = 0; colonne < 9; colonne++){//compute mask
+            val = array[ligne][colonne].valeur;
+            if(val != 0){
+            //Cell contains a value, compute the mask
+                masque &= ~(0x100 >> (val-1));
             }
-            nb_possibilites = calcul_valeurs_possibles_cellule_selon_ligne(i, j, array);
-            if(nb_possibilites == 0){
-                /* Problem : 0 possibility and cell doesn't contain a value */
-                return NO_POSSIBILITY_AND_NO_VALUE;
+        }
+        for(uint8_t colonne = 0; colonne < 9; colonne ++){//applymask
+            val = array[ligne][colonne].valeur;
+            if(val == 0){//Cell doesn't contain a value, apply the mask
+                array[ligne][colonne].valeurs_possibles &= masque;
+                nb_possibilites = update_nb_possibilites(&array[ligne][colonne]);
+                if(nb_possibilites == 0){
+                //Problem : 0 possibility and cell doesn't contain a value
+                    return NO_POSSIBILITY_AND_NO_VALUE;
+                }
             }
+            
         }
     }
     return 0;
@@ -160,57 +166,45 @@ uint16_t calcul_valeurs_possibles_selon_ligne(struct Cellule array[9][9]){
 
 uint16_t calcul_valeurs_possibles_selon_colonne(struct Cellule array[9][9]){
     uint8_t nb_possibilites;
-    for(uint8_t i=0 ; i<9 ; i++){
-        for(uint8_t j=0 ; j<9 ; j++){
-            /* Cell contains a value, don't compute the possibilities */
-            if(array[i][j].valeur){
-                continue;
+    uint8_t val;
+    uint16_t masque;
+    for(uint8_t colonne = 0; colonne < 9; colonne++){
+        masque = 0x1FF;
+        for(uint8_t ligne = 0; ligne < 9; ligne++){//compute mask
+            val = array[ligne][colonne].valeur;
+            if(val != 0){
+            //Cell contains a value, compute the mask
+                masque &= ~(0x100 >> (val-1));
             }
-            nb_possibilites = calcul_valeurs_possibles_cellule_selon_colonne(i, j, array);
-            if(nb_possibilites == 0){
-                /* Problem : 0 possibility and cell doesn't contain a value */
-                return NO_POSSIBILITY_AND_NO_VALUE;
+        }
+        for(uint8_t ligne = 0; ligne < 9; ligne++){//applymask
+            val = array[ligne][colonne].valeur;
+            if(val == 0){//Cell doesn't contain a value, apply the mask
+                array[ligne][colonne].valeurs_possibles &= masque;
+                nb_possibilites = update_nb_possibilites(&array[ligne][colonne]);
+                if(nb_possibilites == 0){
+                //Problem : 0 possibility and cell doesn't contain a value
+                    return NO_POSSIBILITY_AND_NO_VALUE;
+                }
             }
+            
         }
     }
     return 0;
 }
 
-void calcul_valeurs_possibles_selon_block(struct Cellule array[9][9], struct Cellule *min, uint8_t *ligne, uint8_t *colonne){
-    uint8_t nb_possibilites;
+uint16_t calcul_valeurs_possibles_selon_block(struct Cellule array[9][9], uint8_t *ligne, uint8_t *colonne){
+    uint16_t nb_min_value = NB_POSSIBLE_VALUES_UNINIT;
     for(uint8_t i = 1; i<10; i++){
-        nb_possibilites = update_block(i, ligne, colonne, array, min);
-        if(nb_possibilites == 1 || nb_possibilites == NO_POSSIBILITY_AND_NO_VALUE){
-            return;
+        update_block(i, ligne, colonne, array, &nb_min_value);
+        if(nb_min_value == 1 || nb_min_value == NO_POSSIBILITY_AND_NO_VALUE){
+            return nb_min_value;
         }
     }
+    return nb_min_value;
 }
 
-uint8_t calcul_valeurs_possibles_cellule_selon_ligne(uint8_t ligne_fixe, uint8_t colonne_fixe, struct Cellule array[9][9]){
-    uint8_t val;
-    for(uint8_t column = 0; column <9; column++){
-        val = array[ligne_fixe][column].valeur;
-        if((column == colonne_fixe) || (val==0)){
-            continue;
-        }
-        array[ligne_fixe][colonne_fixe].valeurs_possibles &= ~(0x100 >> (val-1));
-    }
-    return update_nb_possibilites(&array[ligne_fixe][colonne_fixe]);
-}
-
-uint8_t calcul_valeurs_possibles_cellule_selon_colonne(uint8_t ligne_fixe, uint8_t colonne_fixe, struct Cellule array[9][9]){
-    uint8_t val;
-    for(uint8_t line = 0; line <9; line++){
-        val = array[line][colonne_fixe].valeur;
-        if((line == ligne_fixe) || (val==0)){
-            continue;
-        }
-        array[ligne_fixe][colonne_fixe].valeurs_possibles &= ~(0x100 >> (val-1));
-    }
-    return update_nb_possibilites(&array[ligne_fixe][colonne_fixe]);
-}
-
-uint8_t update_block(uint8_t block_number,uint8_t *ligne, uint8_t *colonne, struct Cellule array[9][9], struct Cellule *min){
+void update_block(uint8_t block_number,uint8_t *ligne, uint8_t *colonne, struct Cellule array[9][9], uint16_t *min){
     uint8_t val, nb_possibilites;
     uint8_t ligne_start, colonne_start;
     uint8_t i, j;
@@ -253,21 +247,20 @@ uint8_t update_block(uint8_t block_number,uint8_t *ligne, uint8_t *colonne, stru
             nb_possibilites = update_nb_possibilites(&array[i][j]);
             if(nb_possibilites == 0){
                 /* Cell doesn't contain a value and possibility = 0 */
-                min->nombre_possibilites = NO_POSSIBILITY_AND_NO_VALUE;
-                return NO_POSSIBILITY_AND_NO_VALUE;
+                *min = NO_POSSIBILITY_AND_NO_VALUE;
+                return;
             }
-            if(nb_possibilites <= min->nombre_possibilites){
+            if(nb_possibilites <= *min){
                 *ligne = i;
                 *colonne = j;
-                min->nombre_possibilites = nb_possibilites;
-                min->valeurs_possibles = array[i][j].valeurs_possibles;
+                *min = nb_possibilites;
                 if(nb_possibilites == 1){
-                    return 1;
+                    return;
                 }
             }
         }
     }
-    return min->nombre_possibilites;
+    return;
 }
 
 uint8_t update_nb_possibilites(struct Cellule *cell){
